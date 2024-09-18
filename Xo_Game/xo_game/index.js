@@ -89,26 +89,27 @@ function createRoom() {
     document.getElementById("selectX").addEventListener("click", function() {
         charChoice = 'X';
         wait_page();
+        connectWebSocket();
+
     });
 
     document.getElementById("selectO").addEventListener("click", function() {
         charChoice = 'O';
         wait_page();
+        connectWebSocket();
+
     });
 
     function wait_page()
     {
         waitContainer.classList.add("active");
         startContainer.classList.remove("active");
-        document.querySelector('.start-container').s
-
-        // alert("we are waiting");
+        startContainer.style.display = "none";
     }
     function startGame() {
         startContainer.classList.remove("active");
         gameContainer.classList.add("active");
         waitContainer.classList.remove("active");
-        connectWebSocket();
     }
 
     function connectWebSocket() {
