@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", () =>  {
 
     startContainer.innerHTML = `
         <h1>Welcome to Tic Tac Toe</h1>
-        <p>Select your character:</p>
-        <button class="select" id="selectX">Play as X</button>
-        <button class="select" id="selectO">Play as O</button>
+        <button class="select" id="startGame">Start a Game</button>
     `;
 
 
@@ -50,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () =>  {
 
     let charChoice = null;
     let roomCode =null;
+    let currentTurn = 'X'; 
     fetch('http://127.0.0.1:8000/api/rooms/')
     .then(response => response.json())
     .then(data => {
@@ -86,15 +85,7 @@ function createRoom() {
 }
      // Example room code; should be dynamically set
 
-    document.getElementById("selectX").addEventListener("click", function() {
-        charChoice = 'X';
-        wait_page();
-        connectWebSocket();
-
-    });
-
-    document.getElementById("selectO").addEventListener("click", function() {
-        charChoice = 'O';
+    document.getElementById("startGame").addEventListener("click", function() {
         wait_page();
         connectWebSocket();
 
@@ -102,11 +93,14 @@ function createRoom() {
 
     function wait_page()
     {
+        console.log("wait fuction");
         waitContainer.classList.add("active");
         startContainer.classList.remove("active");
         startContainer.style.display = "none";
     }
     function startGame() {
+        console.log("start fuction");
+
         startContainer.classList.remove("active");
         gameContainer.classList.add("active");
         waitContainer.classList.remove("active");
@@ -130,11 +124,25 @@ function createRoom() {
 
             console.log("event type is ", eventType, "message is ", message);
             switch (eventType) {
+                case "CHOICE":
+                    charChoice = message; 
+                    wait_page();
+                    break;
                 case "START":
                     initializeGame();
                     break;
                 case "MOVE":
                     handleMove(message);
+                    break;
+                case "TURN":
+                    if (message.includes('X')) {
+                        currentTurn = 'X';
+                    } else {
+                        currentTurn = 'O';
+                    }
+                    document.getElementById("alert_move").textContent = message;
+                                document.getElementById("alert_move").textContent = `Your turn. Place your move ${currentTurn}`;
+
                     break;
                 case "END":
                     alert(message);
@@ -147,13 +155,12 @@ function createRoom() {
 
         document.querySelectorAll('.square').forEach((element, index) => {
             element.addEventListener('click', function() {
-                if (validMove(index)) {
-
+                if (validMove(index) && isPlayerTurn()) {
                     const moveData = {
                         "event": "MOVE",
                         "message": {
                             "index": index,
-                            "player": charChoice
+                            "player": currentTurn
                         }
                     };
                     socket.send(JSON.stringify(moveData));
@@ -162,21 +169,41 @@ function createRoom() {
         });
 
         function validMove(index) {
-            return document.querySelector(`.square[data-index='${index}']`).textContent === '';
+                return document.querySelector(`.square[data-index='${index}']`).textContent === '';
         }
 
+        // function handleMove(message) {
+        //     const index = message.index;
+        //     const player = message.player;
+        //     // Update the game board UI
+        //     console.log("Index: ", index, "Player: ", player);
+        //     document.querySelector(`.square[data-index='${index}']`).textContent = player;
+        // }
+
+        function isPlayerTurn() {
+            return charChoice === currentTurn;
+        }
+        
+        // After receiving a move update from the server
         function handleMove(message) {
             const index = message.index;
             const player = message.player;
-            // Update the game board UI
-            console.log("Index: ", index, "Player: ", player);
+        
             document.querySelector(`.square[data-index='${index}']`).textContent = player;
+            
+            // Switch turns after a move
+            if (currentTurn === 'X') {
+                currentTurn = 'O';
+            } else {
+                currentTurn = 'X';
+            }
+            
         }
-
         function initializeGame() {
-            // Initialize game state
-            startGame();
+            console.log("intitialze fuction");
             document.getElementById("alert_move").textContent = `Your turn. Place your move ${charChoice}`;
+
+            startGame();
         }
 
         function resetGame() {
