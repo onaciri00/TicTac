@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () =>  {
     showResult.className = "show-Result";
     // gameContainer.className = "leftGame-container";
 
-    // Start Screen
 
     startContainer.innerHTML = `
         <h1>Welcome to Tic Tac Toe</h1>
@@ -23,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () =>  {
     `;
 
 
-    // Game Screen
     gameContainer.innerHTML = `
             <div class="first_container">
             <h3> Turn For</h3>
@@ -60,45 +58,67 @@ document.addEventListener("DOMContentLoaded", () =>  {
     let charChoice = null;
     let roomCode =null;
     let currentTurn = 'X'; 
+function fetchRoom() {
     fetch('http://127.0.0.1:8000/api/rooms/')
-    .then(response => response.json())
-    .then(data => {
-        if (data.length > 0) {
-            roomCode = data[0].code; // Use the room code from the API
-            
-        } else {
-            // If no rooms are available, create a new room
+    .then(response => {
+        if (!response.ok) {
+            console.log("No available rooms, creating a new room...");
             createRoom();
         }
+        return response.json();
     })
-    .catch(error => {
-        console.error("Error fetching rooms:", error);
-    });
+        .then(data => {
+            if (data ) {
+                const room = data;
+                console.log("the room is ", room.code, " and num of player ", room.players);
+                if (room.players <= 2) {
+                    console.log("********************************inside room num ", room.code, " and num of player ", room.players);
+                    roomCode = room.code;  
+                    console.log("Joining existing room with code: ", roomCode); 
+                    wait_page();
+                    connectWebSocket();  
+                } else {
+                    console.log("Room is full, creating a new room...");
+                    createRoom();  
+                }
+            } else {
+                console.log("there is no room");
+                createRoom();
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching rooms:", error);
+        });
+}
 
-// Function to create a new room
+
 function createRoom() {
-
     fetch('http://127.0.0.1:8000/api/rooms/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"code":1})
+        body: JSON.stringify({"code": generateRoomCode()})
     })
     .then(response => response.json())
     .then(data => {
-        roomCode = data.code; 
-        
+        roomCode = data.code;
+        console.log("Created new room with code: ", roomCode); 
+        wait_page();
+        connectWebSocket();
     })
     .catch(error => {
         console.error("Error creating room:", error);
     });
 }
 
+
+function generateRoomCode() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
     document.getElementById("startGame").addEventListener("click", function() {
         wait_page();
-        connectWebSocket();
-
+        fetchRoom();
     });
 
     function wait_page()
@@ -143,6 +163,7 @@ function createRoom() {
                     initializeGame();
                     break;
                 case "MOVE":
+                    console.log("Handle Move");
                     handleMove(message);
                     break;
                 case "TURN":
@@ -190,6 +211,7 @@ function createRoom() {
         document.querySelectorAll('.square').forEach((element, index) => {
             element.addEventListener('click', function() {
                 if (validMove(index) && isPlayerTurn()) {
+                    console.log("this is Handle");
                     element.innerHTML = currentTurn;
                     const moveData = {
                         "event": "MOVE",
@@ -204,32 +226,23 @@ function createRoom() {
         });
 
         function validMove(index) {
+                console.log("Valid Move is ", !is_gameOver,  "and it is ", document.querySelector(`.square[data-index='${index}']`).textContent === '');
                 if (!is_gameOver)
                     return document.querySelector(`.square[data-index='${index}']`).textContent === '';
                 else
                     return false;
         }
-
-        // function handleMove(message) {
-        //     const index = message.index;
-        //     const player = message.player;
-        //     // Update the game board UI
-        //     console.log("Index: ", index, "Player: ", player);
-        //     document.querySelector(`.square[data-index='${index}']`).textContent = player;
-        // }
-
         function isPlayerTurn() {
+            console.log("it is player ", charChoice === currentTurn)
             return charChoice === currentTurn;
         }
         
-        // After receiving a move update from the server
         function handleMove(message) {
             const index = message.index;
             const player = message.player;
         
             document.querySelector(`.square[data-index='${index}']`).textContent = player;
-            
-            // Switch turns after a move
+            console.log("from HM     player is ", player, "and indx is ", index);
             if (currentTurn === 'X') {
                 currentTurn = 'O';
                 document.querySelector(".bg").style.left = "85px";
@@ -296,22 +309,24 @@ function createRoom() {
         }
     }
     const playAgain = ()=> {
+        is_gameOver = false;
+        currentTurn = 'X'; 
+
         console.log('playAgain');
         startContainer.classList.add("active");
         gameContainer.classList.remove("active");
         startContainer.style.display = "block";
         showResult.classList.remove("active");
         document.getElementById("alert_move").textContent = `Your are ${charChoice}`;
-        // document.querySelector(".bg").style.left = "0";
+        document.querySelector(".bg").style.left = "0";
         document.querySelector("#result").innerHTML = "";
         document.querySelector("#play-again").style.display = "none";
-        // document.querySelector(".bg").style.backgroundColor = "#FF2E63";
-        gameContainer.classList.remove('player-o-turn'); 
+        document.querySelector(".bg").style.backgroundColor = "#FF2E63";
+        // gameContainer.classList.remove('player-o-turn'); 
         document.querySelectorAll('.square').forEach((element) => {
             // element.classList.remove('filled');
             element.textContent = '';
             element.style.removeProperty("background-color");
-            element.style.color = "#fff"
         });
     }
     document.querySelector("#play-again").addEventListener("click", playAgain);
