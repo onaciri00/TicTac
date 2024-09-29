@@ -28,7 +28,7 @@ COPY . .
 
 RUN chmod +x entrypoint.sh
 
-EXPOSE 8001
+EXPOSE 8000
 
-ENTRYPOINT ["python3", "manage.py", "runserver", "0.0.0.0:8001"]
+ENTRYPOINT ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 
