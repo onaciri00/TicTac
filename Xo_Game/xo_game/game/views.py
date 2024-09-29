@@ -14,8 +14,8 @@ class RoomListCreateAPIView(APIView):
             room.players += 1
             room.save()
             serializer = RoomSerializer(room)
-            if room.players == 2:
-                room.players += 1
+            # if room.players == 2:
+            #     room.players += 1
             return Response(serializer.data)
         return Response({"message": "No available rooms"}, status=404)
 
