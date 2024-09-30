@@ -58,33 +58,40 @@ document.addEventListener("DOMContentLoaded", () =>  {
     let charChoice = null;
     let roomCode =null;
     let currentTurn = 'X'; 
+    let room_is_created = false;
 function fetchRoom() {
     fetch('http://127.0.0.1:8000/api/rooms/')
     .then(response => {
         if (!response.ok) {
             console.log("No available rooms, creating a new room...");
             createRoom();
+            room_is_created = true;
+            console.log("room was created");
         }
+        console.log("we are about to return ");
         return response.json();
     })
         .then(data => {
-            if (data ) {
+            if (data && !room_is_created) {
                 const room = data;
                 console.log("the room is ", room.code, " and num of player ", room.players);
-                if (room.players <= 2) {
+                if (room.players < 2) {
                     console.log("********************************inside room num ", room.code, " and num of player ", room.players);
                     roomCode = room.code;  
                     console.log("Joining existing room with code: ", roomCode); 
                     wait_page();
-                    connectWebSocket();  
-                } else {
+                    connectWebSocket();
+                    return ;
+                }
+                else {
                     console.log("Room is full, creating a new room...");
                     createRoom();  
                 }
-            } else {
-                console.log("there is no room");
-                createRoom();
             }
+            // else {
+            //     console.log("there is no room");
+            //     createRoom();
+            // }
         })
         .catch(error => {
             console.error("Error fetching rooms:", error);
@@ -313,6 +320,7 @@ function generateRoomCode() {
         currentTurn = 'X'; 
 
         console.log('playAgain');
+        room_is_created = false;
         startContainer.classList.add("active");
         gameContainer.classList.remove("active");
         startContainer.style.display = "block";
