@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () =>  {
     let currentTurn = 'X'; 
     let room_is_created = false;
 function fetchRoom() {
-    fetch('http://127.0.0.1:8000/api/rooms/')
+    fetch('http://127.0.0.1:8001/api/rooms/')
     .then(response => {
         if (!response.ok) {
             console.log("No available rooms, creating a new room...");
@@ -100,7 +100,7 @@ function fetchRoom() {
 
 
 function createRoom() {
-    fetch('http://127.0.0.1:8000/api/rooms/', {
+    fetch('http://127.0.0.1:8001/api/rooms/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ function generateRoomCode() {
     }
 
     function connectWebSocket() {
-        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/play/${roomCode}/`);
+        const socket = new WebSocket(`ws://127.0.0.1:8001/ws/play/${roomCode}/`);
 
         socket.onopen = function() {
             console.log('WebSocket connection established.');
