@@ -48,22 +48,22 @@ class TicTacToeConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if self.room_group_name in connected_players:
             if self.channel_name in connected_players[self.room_group_name]:
-                connected_players[self.room_group_name].remove(self.channel_name)
-                # room = Room.objects.get(code=self.room_code)
-                # room.players -= 1
-                # room.save()
-        
+                # connected_players[self.room_group_name].remove(self.channel_name)
+                player_left_index = connected_players[self.room_group_name].index(self.channel_name)
+                player_left = 'X' if player_left_index == 0 else 'O'  # Assuming the first player is 'X' and the second is 'O'
+            
+            # Remove the player from the connected players list
+            connected_players[self.room_group_name].remove(self.channel_name)
         if len(connected_players[self.room_group_name]) == 1:
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'send_message',
-                    'message': 'The other player has left. You will be disconnected.',
-                    'event': 'END'
+                    'message': f'{player_left}',
+                    'event': 'OVER'
                 }
             )
             await self.close()
-
         if len(connected_players[self.room_group_name]) == 0:
             await self.delete_room() 
             del connected_players[self.room_group_name]

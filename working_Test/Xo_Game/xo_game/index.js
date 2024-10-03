@@ -209,8 +209,10 @@ function generateRoomCode() {
                     break;
                 case "DRAW":
                     console.log('game Draw ', message, 'with ', eventType)
-                    alert("It's a draw!");
                     resetGame();
+                    break;
+                case "OVER":
+                    left_game(message);
                     break;
             }
         };
@@ -270,6 +272,18 @@ function generateRoomCode() {
             startGame();
         }
 
+        function left_game(message){
+            if (message === 'X')
+            {
+                    document.querySelector("#result").innerHTML = 'O' + " won";
+            }
+            else
+            {
+                document.querySelector("#result").innerHTML = 'X' + " won";
+            }
+            resetGame();
+            console.log("this one left");
+        }
         function resetGame() {
             // document.querySelectorAll('.square').forEach((element) => {
             //     element.textContent = '';
