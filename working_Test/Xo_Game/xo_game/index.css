@@ -10,11 +10,11 @@ body {
     background-color: #f5f5f5;
 }
 
-#app {
+/* #app {
     width: 300px;
     margin: 0 auto;
     text-align: center;
-}
+} */
 
 .game-container {
     display: none;
@@ -47,9 +47,10 @@ body {
 
 #game-board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    margin-top: 20px;
+    grid-template-columns: repeat(3, 0fr);
+    gap: 3px;
+    margin: 20px 0;
+    justify-content: center;
 }
 
 .square
@@ -174,7 +175,7 @@ body {
     cursor: pointer;
     transition: all 0.5s;
     display: none;
-     margin-left: 80px;
+     margin: auto;
 }
 
 #play-again:hover
@@ -184,7 +185,7 @@ body {
     color:#000;
 }
 
-.app
+/* .app
 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -193,7 +194,7 @@ body {
     width: 250px;
     margin: 30px auto;
     border: 2px solid black;
-}
+} */
 
 .align{
     display: flex;
@@ -213,8 +214,32 @@ body {
 }
 
 
-.gameContainer.player-o-turn .box:hover 
+.player-o-turn .square:hover 
 {
     background-color: #08D9D6;
     
+}
+
+#app {
+    width: 500px;
+    height: 610px;
+    border: 1px solid white;
+    margin: auto;
+    position: absolute;
+    top: 15%;
+    color: white;
+    font-family: sans-serif;
+    transition: 0.2s ease-in-out;
+    user-select: none;
+    background-color: #233354;
+    text-align: center;
+    padding-top: 5vh;
+    z-index: 5;
+}
+
+.btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: white;
 }

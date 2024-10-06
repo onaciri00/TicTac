@@ -1,4 +1,5 @@
 // static/js/app.js
+// static/js/app.js
 
 document.addEventListener("DOMContentLoaded", () =>  {
     const app = document.getElementById("app");
@@ -7,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () =>  {
     const waitContainer = document.createElement("div");
     const showResult = document.createElement("div");
     let is_gameOver = false;
+    let socket;
     // const leftGameContainer = document.createElement("div");
 
     startContainer.className = "start-container";
@@ -119,6 +121,10 @@ function createRoom() {
     });
 }
 
+function disconnect() {
+    socket.close();
+}
+
 
 function generateRoomCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -145,7 +151,7 @@ function generateRoomCode() {
     }
 
     function connectWebSocket() {
-        const socket = new WebSocket(`ws://127.0.0.1:8001/ws/play/${roomCode}/`);
+        socket = new WebSocket(`ws://127.0.0.1:8001/ws/play/${roomCode}/`);
 
         socket.onopen = function() {
             console.log('WebSocket connection established.');
@@ -186,6 +192,7 @@ function generateRoomCode() {
                     break;
                 case "END":
                     console.log('game over ', message, 'with ', eventType)
+                    resetGame();
                     if (message.includes(charChoice)) {
                         document.querySelector("#result").innerHTML = currentTurn + " win";
                         // keep curent turn here
@@ -193,16 +200,13 @@ function generateRoomCode() {
                     else {
                         if (currentTurn === 'X')
                         {
-                                document.querySelector("#result").innerHTML = 'O' + " loss";
-
+                            document.querySelector("#result").innerHTML = 'O' + " loss";
                         }
                         else
                         {
-
                             document.querySelector("#result").innerHTML = 'X' + " loss";
                         }
                     }
-                    resetGame();
                     break;
                 case "wait":
                     wait_page(message);
@@ -304,7 +308,7 @@ function generateRoomCode() {
                 [0, 4, 8],
                 [2, 4, 6]
             ];
-            boxes = document.querySelectorAll('.square');
+            let boxes = document.querySelectorAll('.square');
             // console.log('this boxes');
             for (let i = 0; i < WinCondation.length; i++)
             {
@@ -313,7 +317,8 @@ function generateRoomCode() {
                 let v1 = boxes[WinCondation[i][1]].innerHTML;
                 let v2 = boxes[WinCondation[i][2]].innerHTML;
                 console.log("the winner is ", v0);
-                if (v0 != "" && v0 === v1&& v0 === v2){
+                if (v0 != "" && v0 === v1 && v0 === v2){
+                    alert("fill the boxes.");
                     // console.log('winner Chose');
                     for (let j = 0; j < 3; j++)
                     {
@@ -334,6 +339,7 @@ function generateRoomCode() {
         currentTurn = 'X'; 
 
         console.log('playAgain');
+        gameContainer.classList.remove('player-o-turn');
         room_is_created = false;
         startContainer.classList.add("active");
         gameContainer.classList.remove("active");
@@ -352,5 +358,45 @@ function generateRoomCode() {
         });
     }
     document.querySelector("#play-again").addEventListener("click", playAgain);
+    // const app = document.querySelector("#app");
+    const freeze = document.querySelector("#freeze");
+
+    const displayXoFunction = () => {
+        freeze.classList.add("unclick");
+        app.style.display = "block";
+        const design = document.querySelector("#design");
+        design.style.filter = "blur(3px)";
+        const games = document.querySelector("#games");
+        games.style.filter = "blur(3px)";
+        const nav = document.querySelector("#nav");
+        nav.style.filter = "blur(3px)";
+    }
+
+    const xoImgBtn = document.querySelector("#XO");
+    xoImgBtn.addEventListener("click", displayXoFunction);
+
+    const closeGame = () => {
+        freeze.classList.remove("unclick");
+        disconnect()
+        playAgain();
+        app.style.display = "none";
+        document.querySelector("#design").style.filter = "blur(0px)";
+        document.querySelector("#games").style.filter = "blur(0px)";
+        document.querySelector("#nav").style.filter = "blur(0px)";
+    }
+
+    const escapeFunction = (event)=> {
+        if (event.key === "Escape") {
+            closeGame();
+        }
+    }
+
+    document.addEventListener("keyup", escapeFunction);
+
+    const closeBtn = document.querySelector(".btn-close");
+    closeBtn.addEventListener("click", closeGame);
 });
 /********  new    ********* */
+
+
+
