@@ -1,0 +1,67 @@
+body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	/* background-image: url("ping-pong-neon-sign-glowing-neon-light-signboard-table-tennis-sign-ping-pong-with-colorful-neon-lights-isolated-brick-wall_191108-229-transformed.jpeg"); */
+}
+
+h1 {
+	font-family: sans-serif;
+	font-size: 4rem;
+	position: absolute;
+	bottom: 100px;
+}
+
+
+#player1Score {
+	color: red;
+	text-shadow: 
+	0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px crimson,
+    0 0 82px #0fa,
+    0 0 92px #0fa;
+	top: -5%;
+	left: 35%;
+}
+
+#player1Name {
+	color: red;
+	text-shadow: 
+	0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px crimson,
+    0 0 82px #0fa,
+    0 0 92px #0fa;
+	top: -5%;
+	left: 5%;
+}
+
+#player2Score {
+	color: blue;
+	text-shadow: 
+	0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px blue,
+    0 0 82px #0fa,
+    0 0 92px #0fa;
+	top: -5%;
+	right: 35%;
+}
+
+#player2Name {
+	color: blue;
+	text-shadow: 
+	0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px blue,
+    0 0 82px #0fa,
+    0 0 92px #0fa;
+	top: -5%;
+	right: 5%;
+}
+
